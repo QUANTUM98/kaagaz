@@ -1,26 +1,20 @@
 import cv2
-import numpy as np
 
-image = cv2.imread(r'Kaagaz\original_image.jpg')
-image = cv2.resize(image, None, fx=0.9, fy=0.9)
-gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+image_path = r"Kaagaz\2.jpg"  
+img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
+if img is None:
+    print(f"Error: Unable to load image from {image_path}")
+else:
+    #Resizing 
+    img = cv2.resize(img, (800, 600))
 
-ret, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-contours, hierarchy = cv2.findContours(binary, mode=cv2.RETR_TREE, method=cv2.CHAIN_APPROX_NONE)
-image_copy = image.copy()
-cv2.drawContours(image_copy, contours, -1, (0, 255, 0), thickness=2, lineType=cv2.LINE_AA)
+    #GaussianBlur
+    blurred = cv2.GaussianBlur(img, (5, 5), 0)
 
-mask = np.zeros_like(gray)
-cv2.drawContours(mask, contours, -1, (255), thickness=cv2.FILLED)
-
-x, y, w, h = cv2.boundingRect(mask)
-
-cropped_image = image[y:y+h, x:x+w]
-cv2.imshow('Grayscale Image', gray)
-cv2.imshow('Drawn Contours', image_copy)
-cv2.imshow('Binary Image', binary)
-cv2.imshow('Cropped Image', cropped_image)
-
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+    edges = cv2.Canny(blurred, 30, 100)
+    #showing
+    cv2.imshow("Original Image", img)
+    cv2.imshow("Edge Detection", edges)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
